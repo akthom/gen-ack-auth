@@ -9,8 +9,10 @@ developing scripts for project studying relaitonship between authorship, acknowl
 **genderID.py** : not yet written; will ID gender of authors and acknowledged entities
 
 output files:
-
-step 1 (out of **AuthorAckExtract.py**)-- rough information extraction
+============
+step 1 
+==
+(out of **AuthorAckExtract.py**)-- rough information extraction
 
 *log.txt* : logs the efficancy of the acknowledgement extractor (or maybe more accurately, the messiness of the JATS: not all articles use the <ack> tag as the should)
 
@@ -20,7 +22,8 @@ step 1 (out of **AuthorAckExtract.py**)-- rough information extraction
 
 *forNER.csv* : for input into Stanford NER
 
-step 2 -- named entity recognition
+step 2 - named entity recognition
+= 
 
 - run forNER.csv through Stanford NER to get
 
@@ -30,8 +33,9 @@ then run _NERoutput.csv_ through **NERExtractor.py** to get
 
 *ackDetail.csv* : which lists each NERed acknowledgee and a PMID
 
-step 3 -- gender ID
-
+step 3 - gender ID
+=
+forked from @ptigas who doesn't seem to have this in a repo
 http://ptigas.com/blog/2012/01/21/name2gender-in-python/
 
 
