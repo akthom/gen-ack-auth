@@ -1,0 +1,3 @@
+dirname, numAck, numOddAck, numNoAck 
+./sampleData,15,0,5
+./sampleData/test,3,0,0

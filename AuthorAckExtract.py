@@ -32,6 +32,9 @@ def ack1():
 
         authorByPMID = open("authorByPMID.csv","a")
         authorByPMID.write("PMID, FirstName, LastName, Rank \n")
+
+        forNER=open("forNER.csv","a")
+        forNER.write("PMID, FullAcknowledgement \n")
         
 #        for dirname, dirnames, filenames in os.walk('../../Desktop/PubMedOA/technoscienceSubset'): 
         for dirname, dirnames, filenames in os.walk('./sampleData'): 
@@ -95,6 +98,7 @@ def ack1():
                                 
 #                                print(filename, str(pmid[0]), contribString)
                                 w.writerow([filename, pmid, len(contribs), contribString, ack])
+                                forNER.write(str(pmid) + ", " + str(ack) + "\n")
 
                                 
                 print ("numAck: "+str(numAck)+" numOddAck: " + str(numOddAck) + " numNoAck: " + str(numNoAck)) #making sure i can count which journals have wellformed JATS vs not
@@ -105,5 +109,6 @@ def ack1():
         outfile.close()
         logfile.close()
         authorByPMID.close()
+        forNER.close()
 
 

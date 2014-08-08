@@ -1,5 +1,0 @@
-mkdir -p /data/ripd/www.ssa.gov/OACT/babynames
-  for ((yr=1879 ; $yr <= 2010 ; yr++)) ; do 
-    echo $yr 
-    curl -d "year=$yr&top=1000&number=p" http://www.ssa.gov/cgi-bin/popularnames.cgi > /data/ripd/www.ssa.gov/OACT/babynames/top-1000-$yr-pct.html 
-  done
