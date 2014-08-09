@@ -6,7 +6,7 @@ developing scripts for project studying relaitonship between authorship, acknowl
 
 **NERExtractor.py** : after running _forNER.csv_ through the Stanford NER (currently using the GUI for testing), this script pulls the <PERSON> entities out and spits them into a separate file
 
-**genderID.py** : not yet written; will ID gender of authors and acknowledged entities
+**IDgender.py** & **parsenames.py** -  ID gender of authors and acknowledged entities
 
 output files:
 ============
@@ -35,7 +35,9 @@ then run _NERoutput.csv_ through **NERExtractor.py** to get
 
 step 3 - gender ID
 =
-forked from @ptigas who doesn't seem to have this in a repo
+forked from @ptigas who doesn't seem to have this in a repo<br>
+used and lightly altered scripts described here to pull names from social security "most popular US baby names" into a csv:
 http://ptigas.com/blog/2012/01/21/name2gender-in-python/
+
 
 
