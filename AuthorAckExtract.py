@@ -31,10 +31,16 @@ def ack1():
         logfile.write("dirname, numAck, numOddAck, numNoAck \n")
 
         authorByPMID = open("authorByPMID.csv","a")
-        authorByPMID.write("PMID, FirstName, LastName, Rank \n")
+        authorByPMID.write("PMID, FirstName, LastName, Rank, Gender \n")
 
         forNER=open("forNER.csv","a")
         forNER.write("PMID, FullAcknowledgement \n")
+
+        genderDict={}  #http://stackoverflow.com/questions/4803999/python-file-to-dictionary
+        with open("nameGender.txt") as x: #HEY make sure this is a txt file, not a csv - they get read differently (only took 2 hours to figure that out....)
+                for line in x:
+                        y=line.split(",")
+                        genderDict[y[0].strip()]=y[1].strip()
         
 #        for dirname, dirnames, filenames in os.walk('../../Desktop/PubMedOA/technoscienceSubset'): 
         for dirname, dirnames, filenames in os.walk('./sampleData'): 
@@ -70,10 +76,21 @@ def ack1():
                                 for i in contribs:
                                         if contribs[a].given_names:
                                                 fullName=str(contribs[a].given_names.get_text().encode("latin-1","ignore"))  + ", " +str(contribs[a].surname.get_text().encode("latin-1","ignore"))
+                                                firstName=str(contribs[a].given_names.get_text().encode("latin-1","ignore"))
                                                 contribNames.append(str(contribs[a].given_names.get_text().encode("latin-1","ignore"))  + " " +str(contribs[a].surname.get_text().encode("latin-1","ignore")) + " , ")
                                                 contribString=contribString + contribNames[a]
 
-                                                authorByPMID.write(str(pmid) + "," + str(fullName) + ", " + str(a+1) + "\n")
+                                                if firstName in genderDict.keys():
+                                                        gender=genderDict[firstName]
+                                                else:
+                                                        gender="UNKNOWN"
+
+
+
+
+
+
+                                                authorByPMID.write(str(pmid) + "," + str(fullName) + ", " + str(a+1) + ", " + str(gender)+ "\n")
 
                                                 a=a+1
                                         #I know that some sort of unicode SHOULD work for this, but I utf-8 spits out incorrect special characters and utfs-16 and 32 spit out gobblegook.  latin-1 seems like the best approximation of what should be printed but still throws errors; will experiment more to figure out what's actually going on later but for now, this will have to do
@@ -87,7 +104,7 @@ def ack1():
                                 elif not soup.back: #if there's no ack or back matter then no ack
                                         ack=("none")
                                         numNoAck=numNoAck+1 
-                                elif not soup.back.sec: #this checking for appropriate back matter sectioning
+                                elif not soup.back.sec: #checking for appropriate back matter sectioning
                                         ack=("none")
                                         numNoAck=numNoAck+1 
                                 else: #otherwise it's this
@@ -110,5 +127,6 @@ def ack1():
         logfile.close()
         authorByPMID.close()
         forNER.close()
+#        genderDict.close()
 
 
