@@ -12,6 +12,13 @@ from bs4 import BeautifulSoup
 soup=BeautifulSoup(tester)
 
 
+genderDict={}  #http://stackoverflow.com/questions/4803999/python-file-to-dictionary
+with open("nameGender.txt") as x: #same as AuthorAckExtract.py
+        for line in x:
+                y=line.split(",")
+                genderDict[y[0].strip()]=y[1].strip()
+            
+
 def ner1():
 
         from bs4 import BeautifulSoup
@@ -19,10 +26,10 @@ def ner1():
         import csv
 
 
-        outfile = open("2ackDetail.csv","a")
+        outfile = open("ackDetail.csv","a")
 
         w=csv.writer(outfile)
-        w.writerow(["PMID ", "PERSON"])
+        w.writerow(["PMID ", "PERSON", "Gender"])
 
         infile=open("2NERoutput.csv","r")
         datareader=csv.reader(infile)
@@ -37,7 +44,20 @@ def ner1():
                         for i in people:
                                 dude=i.get_text().encode("latin-","ignore")
 #                                persons=persons + dude + " , "
-                                w.writerow([pmid, str(dude)])
+                        firstName=dude.split()[0]
+                        print(firstName)
+
+                        if str(firstName) in genderDict.keys():
+                                gender=genderDict[firstName]
+                        else:
+                                gender="UNKNOWN"
+
+
+                        w.writerow([pmid, str(dude), gender])
+                        print(gender)
+        outfile.close()
+        infile.close()
+                                
 
 #                print(pmid, str(persons) )
 
