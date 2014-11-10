@@ -23,17 +23,17 @@ def ack1():
         numOddAck=0
 
 
-        outfile = open("testExtract.csv","a") #, encoding="utf-8") # <-- commented out because code was originally written for python 3.2 but then discovered that it broke 2.7
+        outfile = open("tsFE141109.csv","a") #, encoding="utf-8") # <-- commented out because code was originally written for python 3.2 but then discovered that it broke 2.7
         w=csv.writer(outfile)
         w.writerow(["filename ","PMID ", "NumberOfAuthors","Authors", "ackStmt"])
 
-        logfile = open("log.csv","a")
+        logfile = open("log141109.csv","a")
         logfile.write("dirname, numAck, numOddAck, numNoAck \n")
 
-        authorByPMID = open("authorByPMID.csv","a")
+        authorByPMID = open("authorByPMID141109.csv","a")
         authorByPMID.write("PMID, FirstName, LastName, Rank, Gender \n")
 
-        forNER=open("forNER.csv","a")
+        forNER=open("forNER141109.csv","a")
         forNER.write("PMID, FullAcknowledgement \n")
 
         genderDict={}  #http://stackoverflow.com/questions/4803999/python-file-to-dictionary
@@ -43,7 +43,7 @@ def ack1():
                         genderDict[y[0].strip()]=y[1].strip()
         
 #        for dirname, dirnames, filenames in os.walk('../../Desktop/PubMedOA/technoscienceSubset'): 
-        for dirname, dirnames, filenames in os.walk('./sampleData'): 
+        for dirname, dirnames, filenames in os.walk('../../Desktop/technoscienceSubset'): 
                 print (dirname)
                 numAck=0
                 numNoAck=0
@@ -96,7 +96,7 @@ def ack1():
                                         #I know that some sort of unicode SHOULD work for this, but I utf-8 spits out incorrect special characters and utfs-16 and 32 spit out gobblegook.  latin-1 seems like the best approximation of what should be printed but still throws errors; will experiment more to figure out what's actually going on later but for now, this will have to do
 
                                         
-#this is goofily written but I don't think it's harming anything or adding to processing time? but i don't have time to make better now
+#this is goofily written but I don't think it's harming anything? also i don't have time to make better now
                                         
                                 if soup.ack: #if there's an ack section then that's the ack
                                         ack=soup.ack
