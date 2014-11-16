@@ -7,7 +7,7 @@ simple scripts for project studying relationship between authorship, acknowledge
 
 **AuthorAckExtract.py** : 1) this script crawls a directory containgin PMC files; mines the JATS mark up for different parts of the journal article; and then outputs this into a series of files for later processing (named entity recognition and gender ID)
 
-**NERExtractor.py** : after running _forNER.csv_ through the Stanford NER (currently using the GUI for testing), this script pulls the <PERSON> entities out and spits them into a separate file
+-**NERExtractor.py** : after running _forNER.csv_ through the Stanford NER (currently using the GUI for testing), this script pulls the <PERSON> entities out and spits them into a separate file-
 
 **parsenames.py** -  ID gender of authors and acknowledged entities
 
@@ -24,9 +24,9 @@ run **AuthorAckExtract.py** -- rough information extraction.  This extracts auth
 
 *authorByPMID.csv* : lists each author name by the PMID it was found in.
 
-*forNER.csv* : for input into Stanford NER
+-*forNER.csv* : for input into Stanford NER-
 
-Still need to figure out if all these outputs are really necessary
+_adding NER step into this code -- think it should work without the GUI!!_
 
 
 step 2 - named entity recognition
