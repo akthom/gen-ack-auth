@@ -18,22 +18,24 @@ def ack1():
         from bs4 import BeautifulSoup
         import os
         import csv
+        from nltk.tag.stanford import NERTagger #thanks: http://textminingonline.com/how-to-use-stanford-named-entity-recognizer-ner-in-python-nltk-and-other-programming-languages
+        st=NERTagger('/Applications/stanford-ner-2014-06-16/classifiers/english.conll.4class.distsim.crf.ser.gz','/Applications/stanford-ner-2014-06-16/stanford-ner.jar')
         numAck =0
         numNoAck=0
         numOddAck=0
 
 
-        outfile = open("tsFE141109.csv","a") #, encoding="utf-8") # <-- commented out because code was originally written for python 3.2 but then discovered that it broke 2.7
+        outfile = open("FE141115.csv","a") #, encoding="utf-8") # <-- commented out because code was originally written for python 3.2 but then discovered that it broke 2.7
         w=csv.writer(outfile)
         w.writerow(["filename ","PMID ", "NumberOfAuthors","Authors", "ackStmt"])
 
-        logfile = open("log141109.csv","a")
+        logfile = open("log141115.csv","a")
         logfile.write("dirname, numAck, numOddAck, numNoAck \n")
 
-        authorByPMID = open("authorByPMID141109.csv","a")
+        authorByPMID = open("authorByPMID141115.csv","a")
         authorByPMID.write("PMID, FirstName, LastName, Rank, Gender \n")
 
-        forNER=open("forNER141109.csv","a")
+        forNER=open("NERed141115.csv","a")
         forNER.write("PMID, FullAcknowledgement \n")
 
         genderDict={}  #http://stackoverflow.com/questions/4803999/python-file-to-dictionary
@@ -42,8 +44,8 @@ def ack1():
                         y=line.split(",")
                         genderDict[y[0].strip()]=y[1].strip()
         
-#        for dirname, dirnames, filenames in os.walk('../../Desktop/PubMedOA/technoscienceSubset'): 
-        for dirname, dirnames, filenames in os.walk('../../Desktop/technoscienceSubset'): 
+        for dirname, dirnames, filenames in os.walk('../../Desktop/technoscienceSubset/tester'):  #for testing....
+#        for dirname, dirnames, filenames in os.walk('../../Desktop/technoscienceSubset'): 
                 print (dirname)
                 numAck=0
                 numNoAck=0
@@ -85,11 +87,6 @@ def ack1():
                                                 else:
                                                         gender="UNKNOWN"
 
-
-
-
-
-
                                                 authorByPMID.write(str(pmid) + "," + str(fullName) + ", " + str(a+1) + ", " + str(gender)+ "\n")
 
                                                 a=a+1
@@ -107,15 +104,27 @@ def ack1():
                                 elif not soup.back.sec: #checking for appropriate back matter sectioning
                                         ack=("none")
                                         numNoAck=numNoAck+1 
-                                else: #otherwise it's this
+                                else: #otherwise it's this; need to work with this more because capturing too many figures
                                         ack=soup.back.sec
                                         numOddAck=numOddAck+1
+                                
+                                ack=''.join(str(ack).splitlines()) #added 15 nov 14; i think this should get rid of returns?
                                                                                
 #                                abstract=soup.abstract
                                 
 #                                print(filename, str(pmid[0]), contribString)
                                 w.writerow([filename, pmid, len(contribs), contribString, ack])
-                                forNER.write(str(pmid) + ", " + str(ack) + "\n")
+                                
+                                ##### NER work; 15 nov 14
+                                ugh=[]
+                                NERed=st.tag(ack.replace(".","").split())
+                                for i in NERed:
+                                	if i[1] == 'PERSON':
+                                		ugh.append(i[0])
+                                		print (i[0])
+                                	elif ugh:	
+	                                	forNER.write(str(pmid) + ", " + str(ugh) + "\n")
+	                                	ugh=[]
 
                                 
                 print ("numAck: "+str(numAck)+" numOddAck: " + str(numOddAck) + " numNoAck: " + str(numNoAck)) #making sure i can count which journals have wellformed JATS vs not
