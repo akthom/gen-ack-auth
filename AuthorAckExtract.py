@@ -25,17 +25,17 @@ def ack1():
         numOddAck=0
 
 
-        outfile = open("FE141115.csv","a") #, encoding="utf-8") # <-- commented out because code was originally written for python 3.2 but then discovered that it broke 2.7
+        outfile = open("FE141115a.csv","a") #, encoding="utf-8") # <-- commented out because code was originally written for python 3.2 but then discovered that it broke 2.7
         w=csv.writer(outfile)
         w.writerow(["filename ","PMID ", "NumberOfAuthors","Authors", "ackStmt"])
 
-        logfile = open("log141115.csv","a")
+        logfile = open("log141115a.csv","a")
         logfile.write("dirname, numAck, numOddAck, numNoAck \n")
 
-        authorByPMID = open("authorByPMID141115.csv","a")
+        authorByPMID = open("authorByPMID141115a.csv","a")
         authorByPMID.write("PMID, FirstName, LastName, Rank, Gender \n")
 
-        forNER=open("NERed141115.csv","a")
+        forNER=open("NERed141115a.csv","a")
         forNER.write("PMID, FullAcknowledgement \n")
 
         genderDict={}  #http://stackoverflow.com/questions/4803999/python-file-to-dictionary
@@ -78,7 +78,9 @@ def ack1():
                                 for i in contribs:
                                         if contribs[a].given_names:
                                                 fullName=str(contribs[a].given_names.get_text().encode("latin-1","ignore"))  + ", " +str(contribs[a].surname.get_text().encode("latin-1","ignore"))
-                                                firstName=str(contribs[a].given_names.get_text().encode("latin-1","ignore"))
+                                                firstName=contribs[a].given_names.get_text().encode("latin-1","ignore").split()  #added split, deleted "str(" at beginning 
+                                                firstName=firstName[0] #might need to make this a string?
+                                                print(firstName)
                                                 contribNames.append(str(contribs[a].given_names.get_text().encode("latin-1","ignore"))  + " " +str(contribs[a].surname.get_text().encode("latin-1","ignore")) + " , ")
                                                 contribString=contribString + contribNames[a]
 
@@ -119,12 +121,15 @@ def ack1():
                                 ugh=[]
                                 NERed=st.tag(ack.replace(".","").split())
                                 for i in NERed:
-                                	if i[1] == 'PERSON':
-                                		ugh.append(i[0])
-                                		print (i[0])
-                                	elif ugh:	
-	                                	forNER.write(str(pmid) + ", " + str(ugh) + "\n")
-	                                	ugh=[]
+                                        if i[1] == 'PERSON':
+                                                ugh.append(i[0])
+                                                print (i[0])
+                                        elif ugh:
+                                                ugh=str(ugh).replace(",","").replace("[","").replace("]","").replace("'","")
+                                                print(ugh)
+
+                                                forNER.write(str(pmid) + ", " + str(ugh).strip() + "\n")
+                                                ugh=[]
 
                                 
                 print ("numAck: "+str(numAck)+" numOddAck: " + str(numOddAck) + " numNoAck: " + str(numNoAck)) #making sure i can count which journals have wellformed JATS vs not
