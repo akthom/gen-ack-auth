@@ -133,6 +133,11 @@ def ack1():
                                                 print (str(soup.back.sec.title.contents[0]))
                                                 ack=soup.back.sec
                                                 numOddAck=numOddAck+1
+                                else:
+                                        print (str(soup.back.sec.title.contents[0]))
+                                        ack=("none")
+                                        numNoAck=numNoAck+1 
+
 
                                                 #need to add a closing else?
                                 
@@ -182,7 +187,7 @@ def ack1():
 
                                 w.writerow([filename, pmid, contribString, ack, len(contribs), len(girls), len(boys), len(unknown), str(" ; ".join(acks)), len(ackgirls), len(ackboys), len(ackunknown) ])
 
-                                forRecall.write(str(pmid)+","+ str(" ; ".join(acks))+ ","+str(ack))
+                                forRecall.write(str(pmid)+","+ str(" ; ".join(acks))+ ","+str(ack)+"\n")
                                 
                                         
                                 girls=[]
