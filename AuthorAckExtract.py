@@ -25,17 +25,17 @@ def ack1():
         numOddAck=0
 
 
-        outfile = open("FE141115a.csv","a") #, encoding="utf-8") # <-- commented out because code was originally written for python 3.2 but then discovered that it broke 2.7
+        outfile = open("FE141117.csv","a") #, encoding="utf-8") # <-- commented out because code was originally written for python 3.2 but then discovered that it broke 2.7
         w=csv.writer(outfile)
         w.writerow(["filename ","PMID ", "NumberOfAuthors","Authors", "ackStmt"])
 
-        logfile = open("log141115a.csv","a")
+        logfile = open("log141117.csv","a")
         logfile.write("dirname, numAck, numOddAck, numNoAck \n")
 
-        authorByPMID = open("authorByPMID141115a.csv","a")
+        authorByPMID = open("authorByPMID141117.csv","a")
         authorByPMID.write("PMID, FirstName, LastName, Rank, Gender \n")
 
-        forNER=open("NERed141115a.csv","a")
+        forNER=open("NERed141117.csv","a")
         forNER.write("PMID, FullAcknowledgement \n")
 
         genderDict={}  #http://stackoverflow.com/questions/4803999/python-file-to-dictionary
@@ -80,7 +80,9 @@ def ack1():
                                                 fullName=str(contribs[a].given_names.get_text().encode("latin-1","ignore"))  + ", " +str(contribs[a].surname.get_text().encode("latin-1","ignore"))
                                                 firstName=contribs[a].given_names.get_text().encode("latin-1","ignore").split()  #added split, deleted "str(" at beginning 
                                                 firstName=firstName[0] #might need to make this a string?
-                                                print(firstName)
+                                                
+                                                # print(firstName) #just for testing - delete later
+                                                
                                                 contribNames.append(str(contribs[a].given_names.get_text().encode("latin-1","ignore"))  + " " +str(contribs[a].surname.get_text().encode("latin-1","ignore")) + " , ")
                                                 contribString=contribString + contribNames[a]
 
@@ -94,7 +96,7 @@ def ack1():
                                                 a=a+1
                                         #I know that some sort of unicode SHOULD work for this, but I utf-8 spits out incorrect special characters and utfs-16 and 32 spit out gobblegook.  latin-1 seems like the best approximation of what should be printed but still throws errors; will experiment more to figure out what's actually going on later but for now, this will have to do
 
-                                        
+                                        firstName
 #this is goofily written but I don't think it's harming anything? also i don't have time to make better now
                                         
                                 if soup.ack: #if there's an ack section then that's the ack
@@ -106,9 +108,12 @@ def ack1():
                                 elif not soup.back.sec: #checking for appropriate back matter sectioning
                                         ack=("none")
                                         numNoAck=numNoAck+1 
-                                else: #otherwise it's this; need to work with this more because capturing too many figures
-                                        ack=soup.back.sec
-                                        numOddAck=numOddAck+1
+                                elif any ("acknowl" in s.lower() for s in soup.back.sec.title.contents): #otherwise it's this; need to work with this more because capturing too many figures
+                                                print (str(soup.back.sec.title.contents[0]))
+                                                ack=soup.back.sec
+                                                numOddAck=numOddAck+1
+
+                                                #need to add a closing else?
                                 
                                 ack=''.join(str(ack).splitlines()) #added 15 nov 14; i think this should get rid of returns?
                                                                                
@@ -117,20 +122,31 @@ def ack1():
 #                                print(filename, str(pmid[0]), contribString)
                                 w.writerow([filename, pmid, len(contribs), contribString, ack])
                                 
-                                ##### NER work; 15 nov 14
+                                ##### NER work; 15 nov 14 - uses Stanford NLP directly inline instead of as an external step-- much faster but requires concating the entities
                                 ugh=[]
                                 NERed=st.tag(ack.replace(".","").split())
                                 for i in NERed:
                                         if i[1] == 'PERSON':
                                                 ugh.append(i[0])
-                                                print (i[0])
-                                        elif ugh:
-                                                ugh=str(ugh).replace(",","").replace("[","").replace("]","").replace("'","")
-                                                print(ugh)
+                                                #print (i[0])
+                                        elif ugh:  #now with gender identification!
+                                                genderSearch=[]
+                                                for i in ugh:
+                                                        if i in genderDict.keys():
+                                                                gender=genderDict[i]
+                                                                genderSearch.append(gender)
+                                                if genderSearch:
+                                                        gender=genderSearch[0]
+                                                else:
+                                                        gender="???"
+                                                print (" ".join(ugh).strip(), gender)
+ 
 
-                                                forNER.write(str(pmid) + ", " + str(ugh).strip() + "\n")
+                                                forNER.write(str(pmid) + ", " + str(" ".join(ugh).strip()) + "," + str(gender)+ "\n")
                                                 ugh=[]
+                                                genderSearch=[]
 
+                        
                                 
                 print ("numAck: "+str(numAck)+" numOddAck: " + str(numOddAck) + " numNoAck: " + str(numNoAck)) #making sure i can count which journals have wellformed JATS vs not
                 logfile.write(dirname+","+str(numAck)+","+str(numOddAck)+","+str(numNoAck)+"\n")
