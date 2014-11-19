@@ -2,43 +2,25 @@ gen-ack-auth
 ============
 simple scripts for project studying relationship between authorship, acknowledgement and gender in schol comm
 
+**AuthorAckExtract.py** : this script: 
+
+- crawls a directory containgin PMC files; 
+- mines the JATS mark up for different parts of the journal article (authors lists and acknowledgement statements
+- uses Stanford NER to ID people in the acknowledgment statements
+- ID's the gender of each author and acknowledgee
+- outputs this into a series of files for later analysis (review for precision and recall of the acknowledgement extraction and gender ID).
 
 **nameGender.txt** contains the names and genders*
 
-**AuthorAckExtract.py** : 1) this script crawls a directory containgin PMC files; mines the JATS mark up for different parts of the journal article; and then outputs this into a series of files for later processing (named entity recognition and gender ID)
 
 ~~**NERExtractor.py** : after running _forNER.csv_ through the Stanford NER (currently using the GUI for testing), this script pulls the <PERSON> entities out and spits them into a separate file~~
 
-**parsenames.py** -  ID gender of authors and acknowledged entities
+~~**parsenames.py** -  ID gender of authors and acknowledged entities~~
 
 
-output files:
-============
-step 1 
+
+gender identification
 ==
-run **AuthorAckExtract.py** -- rough information extraction.  This extracts author names, author ranks, acknowledgment text; ID's author gender; counts total number of authors; and produces:
-
-*log.txt* : logs the efficancy of the acknowledgement extractor (or maybe more accurately, the messiness of the JATS: not all articles use the <ack> tag as the should)
-
-*fullExtraction.csv* : this summarizes the initial output; might not be necessary
-
-*authorByPMID.csv* : lists each author name by the PMID it was found in.
-
-~~*forNER.csv* : for input into Stanford NER~~
-
-_adding NER step into this code -- think it should work without the GUI!!_
-
-
-step 2 - named entity recognition
-= 
-
-- run *forNER.csv* through Stanford NER to get text (*NERoutput.csv* )with entities IDed with < pointy brackets > . 
-
-then run _NERoutput.csv_ through **NERExtractor.py** to get
-
-*ackDetail.csv* : which lists each NERed acknowledgee, their gender and a PMID
-
-
 *gender ID scripts forked from [@ptigas] who doesn't seem to have this in a repo<br>
 pulls names from social security "most popular US baby names" into a csv:
 http://ptigas.com/blog/2012/01/21/name2gender-in-python/
