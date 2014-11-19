@@ -26,22 +26,22 @@ def ack1():
         numOddAck=0
 
 
-        outfile = open("FEMasterList141118.csv","a") #, encoding="utf-8") # <-- commented out because code was originally written for python 3.2 but then discovered that it broke 2.7
+        outfile = open("FEMasterList141118a.csv","a") #, encoding="utf-8") # <-- commented out because code was originally written for python 3.2 but then discovered that it broke 2.7
         w=csv.writer(outfile)
 #        w.writerow(["filename ","PMID ", "NumberOfAuthors","Authors", "ackStmt"])
         w.writerow(["filename ","PMID ","AuthorList","Ack", "TotalfAuthors","FemaleAuthors", "MaleAuthors","unknownAuthors", "Acks","FemaleAck","MaleAck","UnknownAck","TotalAck"])
 
 
-        logfile = open("log141118.csv","a")
-        logfile.write("dirname, numAck, numOddAck, numNoAck \n")
+        logfile = open("log141118a.csv","a")
+        logfile.write("dirname, numAck, numOddAck, numNoBack, numNoBackSec, numOddButNoAck \n")
 
-        authorByPMID = open("authorByPMID141118.csv","a")
+        authorByPMID = open("authorByPMID141118a.csv","a")
         authorByPMID.write("PMID, FirstName, LastName, Rank, Gender \n")
 
-        forRecall=open("NERrecall141118.csv","a")
+        forRecall=open("NERrecall141118a.csv","a")
         forRecall.write("PMID, ListofAcks, FullAcknowledgement \n")
 
-        forPrec=open("NERprec141118.csv","a")
+        forPrec=open("NERprec141118a.csv","a")
         forPrec.write("PMID, Ack, Gender \n")  #just added
 
 
@@ -55,13 +55,16 @@ def ack1():
         for dirname, dirnames, filenames in os.walk('../../Desktop/technoscienceSubset'): 
                 print (dirname)
                 numAck=0
-                numNoAck=0
+                numNoBack=0
+                numNoBackSec=0
                 numOddAck=0
+                numOddButNoAck=0
                 
                 
                 for filename in filenames:
                         if filename.endswith('.nxml'):
                                 infile=os.path.join(dirname, filename)
+                                print(filename)
 
                                 
                                 soup = BeautifulSoup(open(infile)) 
@@ -94,6 +97,7 @@ def ack1():
                                         if contribs[a].given_names:
                                                 fullName=str(contribs[a].given_names.get_text().encode("latin-1","ignore"))  + ", " +str(contribs[a].surname.get_text().encode("latin-1","ignore"))
                                                 firstName=contribs[a].given_names.get_text().encode("latin-1","ignore").split()  #added split, deleted "str(" at beginning 
+                                                
                                                 firstName=firstName[0] #might need to make this a string?
                                                 
                                                 # print(firstName) #just for testing - delete later
@@ -123,30 +127,41 @@ def ack1():
                                 if soup.ack: #if there's an ack section then that's the ack
                                         ack=soup.ack
                                         numAck=numAck+1
+                                        print ("ack")
+                                        
                                 elif not soup.back: #if there's no ack or back matter then no ack
                                         ack=("none")
-                                        numNoAck=numNoAck+1 
+                                        numNoBack=numNoBack+1
+                                        print ('no back')
                                 elif not soup.back.sec: #checking for appropriate back matter sectioning
                                         ack=("none")
-                                        numNoAck=numNoAck+1 
-                                elif any ("acknowl" in s.lower() for s in soup.back.sec.title.contents): #otherwise it's this; need to work with this more because capturing too many figures
-                                                print (str(soup.back.sec.title.contents[0]))
+                                        numNoBackSec=numNoBackSec+1
+                                        print ('no back sec')
+
+                                elif soup.back.sec:
+                                        
+                                        #a weird fix - because this was breaking when a file shows up with <bold>formatting -- either need to find a better way of string matching, or strip out the formatting.
+                                        n=soup.back.sec.getText()
+                                        n=n.split()
+#                                        print(n)
+
+                                        if any ("acknowl" in s.lower() for s in n): #used to look in soup.back.sec.title.contents but broke
+                                                print("weird")
+                                                
+                                        #print (str(soup.back.sec.contents))
                                                 ack=soup.back.sec
                                                 numOddAck=numOddAck+1
-                                else:
-                                        print (str(soup.back.sec.title.contents[0]))
-                                        ack=("none")
-                                        numNoAck=numNoAck+1 
-
-
-                                                #need to add a closing else?
+                                                
+                                        else:
+                                                print (n)
+                                                ack=("none")
+                                                numOddButNoAck=numOddButNoAck+1
+                                                print('last else')
                                 
                                 ack=''.join(str(ack).splitlines()) #added 15 nov 14; i think this should get rid of returns?
                                                                                
 #                                abstract=soup.abstract
                                 
-#                                print(filename, str(pmid[0]), contribString)
-#moved this below                                w.writerow([filename, pmid, len(contribs), contribString, ack])
                                 
                                 ##### NER work; 15 nov 14 - uses Stanford NLP directly inline instead of as an external step-- much faster but requires concating the entities
                                 ugh=[]
@@ -169,7 +184,7 @@ def ack1():
                                                 else:
                                                         gender="???"
                     
-                                                print (" ".join(ugh).strip(), gender)
+                                                #print (" ".join(ugh).strip(), gender)
 
                                                 if gender == 'female':
                                                         ackgirls.append(fullName)
@@ -200,7 +215,7 @@ def ack1():
 #"filename ","PMID ", "TotalfAuthors","FemaleAuthors", "MaleAuthors","unknownAuthors", "FemaleAck","MaleAck","UnknownAck","TotalAck]                        
                                 
                 print ("numAck: "+str(numAck)+" numOddAck: " + str(numOddAck) + " numNoAck: " + str(numNoAck)) #making sure i can count which journals have wellformed JATS vs not
-                logfile.write(dirname+","+str(numAck)+","+str(numOddAck)+","+str(numNoAck)+"\n")
+                logfile.write(dirname+","+str(numAck)+","+str(numOddAck)+","+str(numNoBack)+str(numNoBackSec)+str(numOddButNoAck)+"\n")
 
 
         print("done")
